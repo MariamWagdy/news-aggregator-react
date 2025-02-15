@@ -8,7 +8,6 @@ A **Dockerized React.js + TypeScript** project for a news aggregator website. Th
 - Built with **React.js + TypeScript** (latest stable versions)
 - Fully **Dockerized** (works the same locally and in containers)
 - Supports **Node.js v16.20.2** and **NPM v8.19.4**
-- Uses **ESLint** for code quality
 - Includes **hot reloading** for fast development
 - Type-safe development using **TypeScript**
 
@@ -27,7 +26,7 @@ Ensure you have the following installed:
 
 ### ✅ Clone the Repository
 ```sh
-git clone git@github.com:MariamWagdy/news-aggregator-react.git
+git clone https://github.com/yourusername/news-aggregator-react.git
 cd news-aggregator-react
 ```
 
