@@ -30,13 +30,16 @@ export const getAuthData = () => {
 };
 export const logoutUser = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
 };
 export const getAuthHeaders = () => {
     const authData = getAuthData();
     return {
         headers: {
             Authorization: `Bearer ${authData?.token}`,
+            Accept: "application/json",
         },
+        withCredentials: true,
     };
 };
 

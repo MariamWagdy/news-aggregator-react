@@ -48,13 +48,21 @@ export const register = async (name: string, email: string, password: string): P
 
 export const logout = async () => {
     try {
-        await apiClient.post("/logout", getAuthHeaders());
-        toast.success("Logout successful!");
-        logoutUser();
+        const response = await apiClient.post("/logout", {}, getAuthHeaders());
+        if (response.status === 200) {
+            logoutUser();
+            toast.success("Logout successful!");
+        }
     } catch (error: any) {
         console.error("Logout Error:", error.response?.data || error.message);
-        handleApiError(error);
+        if (error.response?.status === 401) {
+            logoutUser();
+            toast.warning("Session expired. Logging out...");
+        } else {
+            handleApiError(error);
+        }
     }
 };
+
 
 

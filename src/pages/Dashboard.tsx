@@ -7,7 +7,16 @@ import "./Css/Dashboard.css";
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState<{ name: string } | null>(null);
+    const [user, setUser] = useState({});
+    useEffect(() => {
+        const authData = getAuthData();
+        if (!authData) {
+            setTimeout(() => navigate("/login"), 0);
+        } else {
+            setUser(authData.user);
+        }
+    }, []);
+
     useEffect(() => {
         const authData = getAuthData();
         if (!authData) {
@@ -24,8 +33,6 @@ const Dashboard: React.FC = () => {
             console.error("Logout failed:", error);
         }
     };
-
-    if (!user) return <p>Loading...</p>;
 
     // @ts-ignore
     return (
