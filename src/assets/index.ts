@@ -1,0 +1,1 @@
+export { default as defaultNewsImage } from "./images/default-news.jpg";
