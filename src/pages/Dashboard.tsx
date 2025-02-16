@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {getAuthData} from "../utils/auth";
+import React, {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {getAuthData} from "@utils";
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
