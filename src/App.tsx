@@ -1,25 +1,24 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import {BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
+import {ProtectedRoute, PublicRoute, NavigateBasedOnAuth} from "@routes";
+import {Register, Login, Dashboard, UserPreferences} from "@pages";
 
-const App: React.FC = () => {
+function App() {
     return (
         <Router>
             <Routes>
-                {/* Default Route - Redirects to Login */}
-                <Route path="/" element={<Navigate to="/login" />} />
-
-                {/* Authentication Routes */}
-                <Route path="/register" element={<Register />} />
-                <Route path="/login" element={<Login />} />
-
-                {/* Protected Dashboard Route (Add auth check if needed) */}
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route element={<PublicRoute/>}>
+                    <Route path="/login" element={<Login/>}/>
+                    <Route path="/register" element={<Register/>}/>
+                </Route>
+                <Route element={<ProtectedRoute/>}>
+                    <Route path="/dashboard" element={<Dashboard/>}/>
+                    <Route path="/preferences" element={<UserPreferences/>}/>
+                </Route>
+                <Route path="/" element={<NavigateBasedOnAuth/>}/>
+                <Route path="*" element={<Navigate to="/" replace/>}/>
             </Routes>
         </Router>
     );
-};
+}
 
 export default App;

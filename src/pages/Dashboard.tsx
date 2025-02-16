@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, Link} from "react-router-dom";
 import {getAuthData} from "@utils";
+import {logout} from "@api";
+
+import "./Css/Dashboard.css";
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState<{ name: string } | null>(null);
-
     useEffect(() => {
         const authData = getAuthData();
         if (!authData) {
@@ -15,22 +17,24 @@ const Dashboard: React.FC = () => {
         }
     }, [navigate]);
 
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
+
     if (!user) return <p>Loading...</p>;
 
+    // @ts-ignore
     return (
-        <div className="container text-center mt-5">
+        <div className="dashboard-container">
             <h1>Welcome, {user.name}!</h1>
-            <p>You are successfully logged in.</p>
-            <button
-                className="btn btn-danger mt-3"
-                onClick={() => {
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-                    navigate("/login");
-                }}
-            >
-                Logout
-            </button>
+            <div className="dashboard-buttons">
+                <Link to="/preferences" className="btn btn-edit">Edit Preferences</Link>
+                <button className="btn btn-logout" onClick={handleLogout}>Logout</button>
+            </div>
         </div>
     );
 };

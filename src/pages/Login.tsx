@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {login} from "../api/authService";
+import {login} from "@api";
 import {useNavigate} from "react-router-dom";
 import {toast, ToastContainer} from "react-toastify";
 
@@ -25,7 +25,7 @@ const Login: React.FC = () => {
 
         try {
             await login(email, password);
-            setTimeout(() => navigate("/dashboard"), 1000);
+            setTimeout(() => navigate("/dashboard"), 2000);
         } catch (error) {
             toast.error("Invalid email or password. Please try again.");
         }

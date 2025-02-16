@@ -1,5 +1,5 @@
 import React, { createContext, useState, ReactNode, useContext } from "react";
-import { login, register, logout } from "../api/authService";
+import { login, register, logout } from "@api";
 
 interface User {
     id: number;
