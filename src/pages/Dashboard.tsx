@@ -1,46 +1,41 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {useNavigate, Link} from "react-router-dom";
-import {getAuthData} from "@utils";
+import useAuth from "@hooks/useAuth";
+import useArticles from "@hooks/useArticles";
 import {logout} from "@api";
-
-import "./Css/Dashboard.css";
+import ArticleFilters from "@components/ArticleFilters/ArticleFilters";
+import Articles from "@components/Articles/Articles";
+import "./css/Dashboard.scss";
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState({});
-    useEffect(() => {
-        const authData = getAuthData();
-        if (!authData) {
-            setTimeout(() => navigate("/login"), 0);
-        } else {
-            setUser(authData.user);
-        }
-    }, []);
-
-    useEffect(() => {
-        const authData = getAuthData();
-        if (!authData) {
-            setTimeout(() => navigate("/login"), 0);
-        } else {
-            setUser(authData.user);
-        }
-    }, [navigate]);
+    const user = useAuth();
+    const {articles, loading, fetchArticles} = useArticles();
 
     const handleLogout = async () => {
-        try {
-            await logout();
-        } catch (error) {
-            console.error("Logout failed:", error);
-        }
+        await logout();
+        navigate("/login");
     };
 
-    // @ts-ignore
+    useEffect(() => {
+        fetchArticles({});
+    }, []);
+
+
     return (
-        <div className="dashboard-container">
-            <h1>Welcome, {user.name}!</h1>
-            <div className="dashboard-buttons">
-                <Link to="/preferences" className="btn btn-edit">Edit Preferences</Link>
-                <button className="btn btn-logout" onClick={handleLogout}>Logout</button>
+        <div className="page-container">
+            <div className="content-wrapper">
+                <div className="dashboard-header">
+                    <div className="right-side">Welcome, {user?.name}!</div>
+                    <div className="left-side">
+                        <Link to="/preferences" className="btn btn-edit">Edit Preferences</Link>
+                        <button className="btn btn-logout" onClick={handleLogout}>Logout</button>
+                    </div>
+                </div>
+                <div className="dashboard-body">
+                    <ArticleFilters onFilterChange={fetchArticles}/>
+                    <Articles articles={articles} loading={loading}/>
+                </div>
             </div>
         </div>
     );
