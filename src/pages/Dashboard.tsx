@@ -31,7 +31,7 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="page-container">
-            <LoadingSpinner loading={loading} />
+            <LoadingSpinner loading={loading || logoutLoading} />
             <div className="content-wrapper">
                 <div className="dashboard-header">
                     <div className="right-side">Welcome, {user?.name}!</div>
