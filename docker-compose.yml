@@ -10,4 +10,5 @@ services:
     stdin_open: true
     environment:
       - WATCHPACK_POLLING=true
-      - REACT_APP_API_URL=http://backend:8000/api
+    env_file:
+      - .env

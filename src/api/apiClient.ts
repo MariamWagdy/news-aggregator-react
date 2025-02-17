@@ -1,8 +1,9 @@
 import axios from "axios";
 import {logoutUser} from "@utils";
 
+const API_URL = process.env.REACT_APP_API_URL
 const apiClient = axios.create({
-    baseURL: "http://localhost:8000/api",
+    baseURL: API_URL,
     withCredentials: true, // For Laravel Sanctum
     headers: {
         "Content-Type": "application/json",
