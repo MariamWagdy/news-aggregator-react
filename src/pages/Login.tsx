@@ -2,12 +2,14 @@ import React, {useState} from "react";
 import {login} from "@api";
 import {useNavigate} from "react-router-dom";
 import {toast, ToastContainer} from "react-toastify";
+import LoadingSpinner from "@components/LoadingSpinner/LoadingSpinner";
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+    const [loading, setLoading] = useState(false);
 
     const validateForm = () => {
         let newErrors: { email?: string; password?: string } = {};
@@ -23,16 +25,20 @@ const Login: React.FC = () => {
 
         if (!validateForm()) return;
 
+        setLoading(true);
         try {
             await login(email, password);
             setTimeout(() => navigate("/dashboard"), 2000);
         } catch (error) {
             toast.error("Invalid email or password. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="container d-flex justify-content-center align-items-center vh-100">
+            <LoadingSpinner loading={loading}/>
             <ToastContainer position="top-right" autoClose={3000}/>
             <div className="card p-4 shadow-lg w-50">
                 <h2 className="text-center mb-3">Sign In</h2>

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import NewsViewer from "../NewsViewer/NewsViewer";
 import './css/Articles.scss';
 

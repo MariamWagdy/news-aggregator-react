@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { register } from "@api";
-import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import React, {useState} from "react";
+import {register} from "@api";
+import {useNavigate} from "react-router-dom";
+import {toast, ToastContainer} from "react-toastify";
+import LoadingSpinner from "@components/LoadingSpinner/LoadingSpinner";
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -11,6 +12,7 @@ const Register: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
+    const [loading, setLoading] = useState(false);
 
     const validateForm = () => {
         let newErrors: { name?: string; email?: string; password?: string } = {};
@@ -26,18 +28,22 @@ const Register: React.FC = () => {
         setErrors({});
 
         if (!validateForm()) return;
+        setLoading(true);
 
         try {
             await register(name, email, password);
             setTimeout(() => navigate("/dashboard"), 1500);
         } catch (error) {
             toast.error("Registration failed. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="container d-flex justify-content-center align-items-center vh-100">
-            <ToastContainer position="top-right" autoClose={3000} />
+            <LoadingSpinner loading={loading}/>
+            <ToastContainer position="top-right" autoClose={3000}/>
             <div className="card p-4 shadow-lg w-50">
                 <h2 className="text-center mb-3">Sign Up</h2>
                 <form onSubmit={handleSubmit}>
