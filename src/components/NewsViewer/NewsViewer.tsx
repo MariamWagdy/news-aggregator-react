@@ -3,6 +3,8 @@ import {useNavigate} from "react-router-dom";
 import {formatDate} from "@utils";
 import {defaultNewsImage} from "@assets";
 import DOMPurify from "dompurify";
+import {FcAdvertising, FcCalendar, FcGlobe, FcIdea, FcBusinessman} from "react-icons/fc";
+import {PiLinkBold} from "react-icons/pi";
 import "./css/NewsViewer.scss";
 
 interface NewsViewerProps {
@@ -12,7 +14,7 @@ interface NewsViewerProps {
     author?: string;
     source?: string;
     platform?: { name: string; url: string };
-    categories?: string[];
+    category?: { id: number; name: string };
     publishedAt?: string;
     articleUrl?: string;
 }
@@ -24,7 +26,7 @@ const NewsViewer: React.FC<NewsViewerProps> = ({
                                                    author,
                                                    source,
                                                    platform,
-                                                   categories = [],
+                                                   category,
                                                    publishedAt,
                                                    articleUrl
                                                }) => {
@@ -37,17 +39,8 @@ const NewsViewer: React.FC<NewsViewerProps> = ({
     const isLong = words.length > maxWords;
     const visibleContent = words.slice(0, maxWords).join(" ") + (isLong ? "..." : "");
 
-
-    const handleClick = () => {
-        if (articleUrl) {
-            window.open(articleUrl, "_blank");
-        } else {
-            navigate("/article");
-        }
-    };
-
     return (
-        <div className="news-card" onClick={handleClick}>
+        <div className="news-card">
             <div className="news-row">
                 <div className="news-image-container">
                     <img src={imageUrl || defaultNewsImage} alt={title} className="news-image"/>
@@ -64,28 +57,36 @@ const NewsViewer: React.FC<NewsViewerProps> = ({
                         <span dangerouslySetInnerHTML={{__html: expanded ? cleanContent : visibleContent}}/>
                     </p>
                     <div className="news-meta">
-                        <small>📅 {formatDate(publishedAt)}</small>
-                        {platform && (
+                        {publishedAt && (
+                            <small><FcCalendar size={15}/> {formatDate(publishedAt)}</small>
+                        )}
+                        {source && (
+                            <small><FcAdvertising size={15}/> {source}</small>
+                        )}
+                        {author && (
+                            <small><FcBusinessman size={15}/> {author}</small>
+                        )}
+                        {category && (
                             <small>
-                                🔗 <a href={platform.url} target="_blank" rel="noopener noreferrer"
-                                     className="news-platform">
-                                {platform.name}
-                            </a>
+                                <span className="badge category-badge">
+                                    {category.name}
+                                </span>
                             </small>
                         )}
-                        {source && <small>📢 {source}</small>}
-                        {author && <small>✍️ {author}</small>}
                     </div>
+
+                    {platform && (
+                        <div className="news-platform-badge">
+                            <PiLinkBold size={15}/>
+                            <a href={platform.url} target="_blank" rel="noopener noreferrer"
+                               className="news-platform-link">
+                                {platform.name}
+                            </a>
+                        </div>
+                    )}
+
                 </div>
             </div>
-
-            {categories.length > 0 && (
-                <div className="news-categories">
-                    {categories.map((category, index) => (
-                        <span key={index} className="badge bg-secondary">{category}</span>
-                    ))}
-                </div>
-            )}
         </div>
     );
 };

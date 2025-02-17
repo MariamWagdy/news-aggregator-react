@@ -23,7 +23,7 @@ const Articles: React.FC<ArticlesProps> = ({articles, loading}) => {
                     author={article.author}
                     source={article.source}
                     platform={article.platform}
-                    categories={article.category}
+                    category={article.category}
                     publishedAt={article.published_at}
                     articleUrl={article.url}
                 />
