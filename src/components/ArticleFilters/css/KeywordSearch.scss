@@ -1,0 +1,21 @@
+.keyword-search {
+  width: 100%;
+  max-width: 250px;
+
+  .search-input {
+    height: 35px;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: white;
+    transition: border 0.2s ease-in-out;
+
+    &:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+    }
+  }
+}

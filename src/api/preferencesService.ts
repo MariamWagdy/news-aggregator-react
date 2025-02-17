@@ -1,9 +1,23 @@
 import apiClient from "./apiClient";
 import {getAuthHeaders, extractResponseData, handleApiError} from "@utils";
 
+
+export const getAvailablePlatforms = async () => {
+    try {
+        const response = await apiClient.get("/platforms", {...getAuthHeaders()});
+        if (response.status === 200) {
+            return extractResponseData(response);
+        }
+    } catch (error: any) {
+        console.error("Login Error:", error.response?.data || error.message);
+        handleApiError(error);
+    }
+};
+
+
 export const getAvailableCategories = async () => {
     try {
-        const response = await apiClient.get("/categories", getAuthHeaders());
+        const response = await apiClient.get("/categories", {...getAuthHeaders()});
         if (response.status === 200) {
             return extractResponseData(response);
         }
@@ -15,7 +29,7 @@ export const getAvailableCategories = async () => {
 
 export const getAvailableAuthors = async () => {
     try {
-        const response = await apiClient.get("/authors", getAuthHeaders());
+        const response = await apiClient.get("/authors", {...getAuthHeaders()});
         if (response.status === 200) {
             return extractResponseData(response);
         }
@@ -27,7 +41,7 @@ export const getAvailableAuthors = async () => {
 
 export const getAvailableSources = async () => {
     try {
-        const response = await apiClient.get("/sources", getAuthHeaders());
+        const response = await apiClient.get("/sources", {...getAuthHeaders()});
         if (response.status === 200) {
             return extractResponseData(response);
         }
@@ -40,7 +54,7 @@ export const getAvailableSources = async () => {
 
 export const getUserPreferences = async () => {
     try {
-        const response = await apiClient.get("/user/preferences", getAuthHeaders());
+        const response = await apiClient.get("/user/preferences", {...getAuthHeaders()});
         if (response.status === 200) {
             return extractResponseData(response);
         }
@@ -56,7 +70,7 @@ export const saveUserPreferences = async (preferences: {
     sources: []
 }) => {
     try {
-        const response = await apiClient.post("/user/preferences", preferences, getAuthHeaders());
+        const response = await apiClient.post("/user/preferences", preferences, {...getAuthHeaders()});
         if (response.status === 200) {
             return extractResponseData(response);
         }

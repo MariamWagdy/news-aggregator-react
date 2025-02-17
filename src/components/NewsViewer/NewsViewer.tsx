@@ -1,13 +1,13 @@
-import React from "react";
+import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {formatDate} from "@utils";
 import {defaultNewsImage} from "@assets";
-
-import "./Css/NewsViewer.css";
+import DOMPurify from "dompurify";
+import "./css/NewsViewer.scss";
 
 interface NewsViewerProps {
     title: string;
-    content: string; // Can contain HTML
+    content: string;
     imageUrl?: string;
     author?: string;
     source?: string;
@@ -29,6 +29,14 @@ const NewsViewer: React.FC<NewsViewerProps> = ({
                                                    articleUrl
                                                }) => {
     const navigate = useNavigate();
+    const [expanded, setExpanded] = useState(false);
+
+    const cleanContent = DOMPurify.sanitize(content);
+    const maxWords = 40;
+    const words = cleanContent.split(" ");
+    const isLong = words.length > maxWords;
+    const visibleContent = words.slice(0, maxWords).join(" ") + (isLong ? "..." : "");
+
 
     const handleClick = () => {
         if (articleUrl) {
@@ -53,9 +61,8 @@ const NewsViewer: React.FC<NewsViewerProps> = ({
                     </h5>
 
                     <p className="news-description">
-                        <span dangerouslySetInnerHTML={{__html: content}}/>
+                        <span dangerouslySetInnerHTML={{__html: expanded ? cleanContent : visibleContent}}/>
                     </p>
-
                     <div className="news-meta">
                         <small>📅 {formatDate(publishedAt)}</small>
                         {platform && (
