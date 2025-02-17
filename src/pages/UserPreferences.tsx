@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     getAvailableCategories,
     getAvailableAuthors,
@@ -6,17 +6,22 @@ import {
     getUserPreferences,
     saveUserPreferences
 } from "@api";
-import {useNavigate} from "react-router-dom";
-import {toast} from "react-toastify";
-import "./Css/UserPreferences.css";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { UserPreferencesSection, LoadingSpinner } from "@components";
+
+import "./css/UserPreferences.scss";
 
 const UserPreferences: React.FC = () => {
+    const sections = [
+        { title: "Categories", key: "categories", fetch: getAvailableCategories },
+        { title: "Authors", key: "authors", fetch: getAvailableAuthors },
+        { title: "Sources", key: "sources", fetch: getAvailableSources },
+    ];
+
     const navigate = useNavigate();
-    const [data, setData] = useState<{
-        categories: { id: number; name: string }[];
-        authors: string[];  // Authors are just names (strings)
-        sources: { id: number; name: string }[];
-    }>({
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState<{ [key: string]: any[] }>({
         categories: [],
         authors: [],
         sources: []
@@ -25,65 +30,64 @@ const UserPreferences: React.FC = () => {
     const [userPreferences, setUserPreferences] = useState<{
         categories: number[];
         authors: string[];
-        sources: number[];
+        sources: string[];
     }>({
         categories: [],
         authors: [],
         sources: []
     });
 
-    const [loading, setLoading] = useState(true);
-
-    // Handle checkbox change
-    const handleCheckboxChange = (itemId: number, type: "categories" | "authors" | "sources") => {
+    // Handle selection toggling
+    const handleToggle = (item: any, type: "categories" | "authors" | "sources") => {
         setUserPreferences((prev) => ({
             ...prev,
-            [type]: prev[type as keyof typeof prev].includes(itemId)
-                ? prev[type as keyof typeof prev].filter((id) => id !== itemId) // Remove if already selected
-                : [...prev[type as keyof typeof prev], itemId], // Add if not selected
+            [type]: prev[type].includes(item)
+                ? prev[type].filter((id) => id !== item)
+                : [...prev[type], item]
         }));
     };
+
+    // Handle save
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         try {
             await saveUserPreferences(userPreferences);
             toast.success("Preferences saved successfully!");
             navigate("/dashboard");
         } catch (error) {
             toast.error("Failed to save preferences.");
-            console.error("Error saving preferences", error);
+        } finally {
+            setLoading(false);
         }
     };
 
+    // Fetch data
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
-                setLoading(true);
+                const results = await Promise.all(sections.map((section) => section.fetch()));
 
-                // Fetch all data in parallel
-                const [responseCategories, responseAuthors, responseSources] = await Promise.all([
-                    getAvailableCategories(),
-                    getAvailableAuthors(),
-                    getAvailableSources()
-                ]);
-                setData({
-                    categories: responseCategories || [],
-                    authors: responseAuthors || [],
-                    sources: responseSources || []
+                // Map results dynamically
+                const newData: { [key: string]: any[] } = {};
+                sections.forEach((section, index) => {
+                    newData[section.key] = results[index] || [];
                 });
+
+                setData(newData);
+
                 // Fetch user preferences
                 const userPrefs = await getUserPreferences();
                 if (userPrefs) {
                     setUserPreferences({
-                        categories: userPrefs.categories ? userPrefs.categories.map((cat: {
-                            id: number
-                        }) => cat.id) : [],
+                        categories: userPrefs.categories ? userPrefs.categories.map((c: { id: number }) => c.id) : [],
                         authors: userPrefs.authors || [],
                         sources: userPrefs.sources || []
                     });
                 }
             } catch (error) {
-                console.error("Failed to fetch data", error);
+                toast.error("Failed to load preferences.");
             } finally {
                 setLoading(false);
             }
@@ -91,74 +95,35 @@ const UserPreferences: React.FC = () => {
 
         fetchData();
     }, []);
+
     return (
-        <div className="preferences-container">
-            {loading && (
-                <div className="spinner-overlay">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
+        <div className="user-preferences-container">
+            <h2 className="page-title">Customize Your News Preferences</h2>
+
+            {loading ? (
+                <LoadingSpinner loading={loading} />
+            ) : (
+                <>
+                    <p className="page-subtitle">
+                        Select the categories, authors, and sources you prefer to tailor your news feed.
+                    </p>
+
+                    {/* Dynamically Render Sections */}
+                    {sections.map(({ title, key }) => (
+                        <UserPreferencesSection
+                            key={key}
+                            title={title}
+                            items={data[key]}
+                            selectedItems={userPreferences[key]}
+                            onToggle={(item) => handleToggle(item, key)}
+                        />
+                    ))}
+
+                    <button className="btn btn-primary save-btn" onClick={handleSubmit}>
+                        Save Preferences
+                    </button>
+                </>
             )}
-            <div className={loading ? "content-disabled" : ""}>
-                <h2 className="preferences-title">Select Your Preferences</h2>
-                <form onSubmit={handleSubmit}>
-                    {/* Categories Section */}
-                    <div className="pref-section">
-                        <h4 className="section-title">Categories</h4>
-                        <div className="pref-list">
-                            {data.categories.map((category) => (
-                                <label key={category.id} className="custom-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        checked={userPreferences.categories.includes(category.id)}
-                                        onChange={() => handleCheckboxChange(category.id, "categories")}
-                                    />
-                                    <span className="checkmark"></span>
-                                    {category.name}
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Authors Section */}
-                    <div className="pref-section">
-                        <h4 className="section-title">Authors</h4>
-                        <div className="pref-list">
-                            {data.authors.map((author, index) => (
-                                <label key={index} className="custom-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        checked={userPreferences.authors.includes(author.author)}
-                                        onChange={() => handleCheckboxChange(author.author, "authors")}
-                                    />
-                                    <span className="checkmark"></span>
-                                    {author.author}
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Sources Section */}
-                    <div className="pref-section">
-                        <h4 className="section-title">Sources</h4>
-                        <div className="pref-list">
-                            {data.sources.map((source, index) => (
-                                <label key={index} className="custom-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        checked={userPreferences.sources.includes(source.source)}
-                                        onChange={() => handleCheckboxChange(source.source, "sources")}
-                                    />
-                                    <span className="checkmark"></span>
-                                    {source.source}
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                    <button type="submit" className="btn btn-primary save-btn">Save Preferences</button>
-                </form>
-            </div>
         </div>
     );
 };

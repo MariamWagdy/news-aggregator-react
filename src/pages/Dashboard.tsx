@@ -1,20 +1,27 @@
-import React, {useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import {useNavigate, Link} from "react-router-dom";
 import useAuth from "@hooks/useAuth";
 import useArticles from "@hooks/useArticles";
 import {logout} from "@api";
-import ArticleFilters from "@components/ArticleFilters/ArticleFilters";
-import Articles from "@components/Articles/Articles";
+import {ArticleFilters, Articles, LoadingSpinner} from "@components";
 import "./css/Dashboard.scss";
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
     const user = useAuth();
     const {articles, loading, fetchArticles} = useArticles();
+    const [logoutLoading, setLogoutLoading] = useState(false);
 
     const handleLogout = async () => {
-        await logout();
-        navigate("/login");
+        setLogoutLoading(true);
+        try {
+            await logout();
+            navigate("/login");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        } finally {
+            setLogoutLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -24,6 +31,7 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="page-container">
+            <LoadingSpinner loading={loading || logoutLoading} />
             <div className="content-wrapper">
                 <div className="dashboard-header">
                     <div className="right-side">Welcome, {user?.name}!</div>
