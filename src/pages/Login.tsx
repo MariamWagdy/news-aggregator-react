@@ -24,14 +24,14 @@ const Login: React.FC = () => {
         setErrors({});
 
         if (!validateForm()) return;
-
         setLoading(true);
         try {
             await login(email, password);
-            setTimeout(() => navigate("/dashboard"), 2000);
+
         } catch (error) {
             toast.error("Invalid email or password. Please try again.");
         } finally {
+            navigate("/dashboard");
             setLoading(false);
         }
     };
