@@ -32,7 +32,7 @@ const Register: React.FC = () => {
 
         try {
             await register(name, email, password);
-            setTimeout(() => navigate("/dashboard"), 1500);
+            navigate("/dashboard")
         } catch (error) {
             toast.error("Registration failed. Please try again.");
         } finally {

@@ -9,7 +9,7 @@ import "./css/Dashboard.scss";
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
     const user = useAuth();
-    const {articles, loading, fetchArticles} = useArticles();
+    const {articles, loading, fetchArticles, loadMore, hasMore} = useArticles();
     const [logoutLoading, setLogoutLoading] = useState(false);
 
     const handleLogout = async () => {
@@ -24,14 +24,9 @@ const Dashboard: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        fetchArticles({});
-    }, []);
-
-
     return (
         <div className="page-container">
-            <LoadingSpinner loading={loading || logoutLoading} />
+            <LoadingSpinner loading={loading || logoutLoading}/>
             <div className="content-wrapper">
                 <div className="dashboard-header">
                     <div className="right-side">Welcome, {user?.name}!</div>
@@ -43,6 +38,11 @@ const Dashboard: React.FC = () => {
                 <div className="dashboard-body">
                     <ArticleFilters onFilterChange={fetchArticles}/>
                     <Articles articles={articles} loading={loading}/>
+                    {hasMore && !loading && (
+                        <div className="load-more-container">
+                            <button className="btn btn-load-more" onClick={loadMore}> Load More</button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
